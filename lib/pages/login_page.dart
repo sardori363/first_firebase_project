@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase/pages/home_page.dart';
 import 'package:flutter_firebase/pages/register_page.dart';
+import 'package:flutter_firebase/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   static const id = "login_page_id/";
@@ -10,7 +13,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   bool enteredWrongDetails = true;
 
   @override
@@ -52,12 +54,15 @@ class _LoginPageState extends State<LoginPage> {
               Container(
                   padding: EdgeInsets.symmetric(horizontal: 15),
                   child: Text(
-                    enteredWrongDetails? "Enter your email and password to login" : "Invalid username and / or password Please try again",
+                    enteredWrongDetails
+                        ? "Enter your email and password to login"
+                        : "Invalid username and / or password Please try again",
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: enteredWrongDetails ? Color.fromARGB(255, 69, 75, 96): Colors.red
-                        ),
+                        color: enteredWrongDetails
+                            ? Color.fromARGB(255, 69, 75, 96)
+                            : Colors.red),
                     textAlign: TextAlign.center,
                   )),
               Container(
@@ -108,10 +113,20 @@ class _LoginPageState extends State<LoginPage> {
                 height: 15,
               ),
               MaterialButton(
-                onPressed: () {
-                  // setState(() {
-                  //   enteredWrongDetails = !enteredWrongDetails;
-                  // });
+                onPressed: () async {
+                  User? user = await AuthService.loginUser(context,
+                      email: emailController.text,
+                      password: passwordController.text);
+
+                  if (user != null) {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => HomePage()));
+                  } else {
+                    enteredWrongDetails = false;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Failed to login")));
+                    setState(() {});
+                  }
                 },
                 minWidth: double.infinity,
                 height: 45,
@@ -135,14 +150,15 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   InkWell(
-                    onTap: (){
+                    onTap: () {
                       print("sm");
                     },
                     child: Container(
                       decoration: BoxDecoration(
                           border: Border.all(
-                        color: Color(0xFF454B60),
-                      ),borderRadius: BorderRadius.circular(10)),
+                            color: Color(0xFF454B60),
+                          ),
+                          borderRadius: BorderRadius.circular(10)),
                       width: 142,
                       height: 45,
                       child: Row(
@@ -155,19 +171,21 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Color(0xFF454B60),
                                 fontWeight: FontWeight.w700),
                           ),
-                          SizedBox(width: 5,)
+                          SizedBox(
+                            width: 5,
+                          )
                         ],
                       ),
                     ),
                   ),
                   InkWell(
-                    onTap: (){
+                    onTap: () {
                       print("sm");
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                   color: Color(0xFF454B60),
+                        borderRadius: BorderRadius.circular(10),
+                        color: Color(0xFF454B60),
                       ),
                       width: 142,
                       height: 45,
@@ -181,14 +199,16 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700),
                           ),
-                          SizedBox(width: 5,)
+                          SizedBox(
+                            width: 5,
+                          )
                         ],
                       ),
                     ),
                   ),
                 ],
               ),
-            SizedBox(
+              SizedBox(
                 height: 20,
               ),
               Row(
@@ -196,24 +216,32 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   const Text("Don't have an account?"),
                   GestureDetector(
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (c)=> const RegisterPage()));
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (c) => const RegisterPage()));
                     },
-                      child: const Text(" Register", style: TextStyle(fontWeight: FontWeight.w700),),
+                    child: const Text(
+                      " Register",
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
                   )
                 ],
               ),
-               SizedBox(
+              SizedBox(
                 height: 40,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("Need help? Visit our"),
-                  Text(" help center", style: TextStyle(fontWeight: FontWeight.w700),)
+                  Text(
+                    " help center",
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  )
                 ],
               )
-            
             ],
           ),
         ),
